@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1087234870293",
+    "firebase_url": "https://baseresidencia-default-rtdb.firebaseio.com",
+    "project_id": "baseresidencia",
+    "storage_bucket": "baseresidencia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087234870293:android:4593043aec27ca5744d21c",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_final"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087234870293-hac3oeur3vhk0hosbhuk1h3og9scmfbp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.proyecto_final",
+            "certificate_hash": "05b54532a0863fad1e4bbc72d85a376a54eeea13"
+          }
+        },
+        {
+          "client_id": "1087234870293-v6367au2of5amlj1nnd27cn0rh3h98gj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA8WydP9f7ROFD97z5rOyyd4T3y7Yol48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1087234870293-v6367au2of5amlj1nnd27cn0rh3h98gj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
