@@ -65,8 +65,9 @@ class ProductInfoState extends State<ProductInfo> {
           title: Text('Información'),
           backgroundColor: Colors.cyan[800],
         ),
-        body: Center(
-            child: Container(
+        body: SingleChildScrollView(
+            child: Center(
+                child: Container(
           padding: EdgeInsets.all(7.0),
           child: Column(
             children: <Widget>[
@@ -83,100 +84,99 @@ class ProductInfoState extends State<ProductInfo> {
                 height: 15.0,
               ),
               Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    new Text(
-                      items![position].desc.toString(),
-                      style: TextStyle(fontSize: 25.0),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    new Text(
-                      "\$${items![position].price!.toStringAsFixed(2)}",
-                      style: TextStyle(fontSize: 38.0),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    new Text(
-                      "Existencias: ${items![position].stock} unidades",
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Row(
-                      children: [
-                        Text('Cantidad: ', style: TextStyle(fontSize: 18.0)),
-                        SizedBox(
-                          width: 10,
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  new Text(
+                    items![position].desc.toString(),
+                    style: TextStyle(fontSize: 25.0),
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  new Text(
+                    "\$${items![position].price!.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 38.0),
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  new Text(
+                    "Existencias: ${items![position].stock} unidades",
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Row(
+                    children: [
+                      Text('Cantidad: ', style: TextStyle(fontSize: 18.0)),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        width: 60,
+                        height: 40,
+                        padding: EdgeInsets.only(left: 3.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                              color: Colors.black,
+                              style: BorderStyle.solid,
+                              width: 0.0),
                         ),
-                        Container(
-                          width: 60,
-                          height: 40,
-                          padding: EdgeInsets.only(left: 3.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                                color: Colors.black,
-                                style: BorderStyle.solid,
-                                width: 0.0),
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          underline: Container(
+                            color: Colors.transparent,
                           ),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            underline: Container(
-                              color: Colors.transparent,
-                            ),
-                            value: dropdownValue,
-                            elevation: 16,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownValue = newValue!;
-                              });
-                            },
-                            items: List.generate(
-                                int.parse(items![position].stock.toString()),
-                                (index) => DropdownMenuItem(
-                                    value: (index + 1).toString(),
-                                    child: Text(
-                                      (index + 1).toString(),
-                                      style: TextStyle(fontSize: 18),
-                                    ))),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    _Boton(
-                        text: 'Comprar',
-                        icon: Icon(Icons.monetization_on),
-                        color: Colors.cyan[800]!,
-                        textColor: Colors.black,
-                        onTap: () {}),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    _Boton(
-                        text: 'Agregar al carrito',
-                        icon: Icon(Icons.add_shopping_cart),
-                        color: Colors.white,
-                        textColor: Colors.black,
-                        onTap: () {
-                          _navigateToShoppingCart(context, widget.user);
-                        }),
-                  ],
-                ),
-              ),
+                          value: dropdownValue,
+                          elevation: 16,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownValue = newValue!;
+                            });
+                          },
+                          items: List.generate(
+                              int.parse(items![position].stock.toString()),
+                              (index) => DropdownMenuItem(
+                                  value: (index + 1).toString(),
+                                  child: Text(
+                                    (index + 1).toString(),
+                                    style: TextStyle(fontSize: 18),
+                                  ))),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  _Boton(
+                      text: 'Comprar',
+                      icon: Icon(Icons.monetization_on),
+                      color: Colors.cyan[800]!,
+                      textColor: Colors.black,
+                      onTap: () {}),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  _Boton(
+                      text: 'Agregar al carrito',
+                      icon: Icon(Icons.add_shopping_cart),
+                      color: Colors.white,
+                      textColor: Colors.black,
+                      onTap: () {
+                        _navigateToShoppingCart(context, widget.user);
+                      }),
+                ],
+              )),
               SizedBox(
                 height: 15.0,
               ),
             ],
           ),
-        )));
+        ))));
   }
 
   void _navigateToShoppingCart(BuildContext context, String user) async {
@@ -267,121 +267,3 @@ class _Boton extends StatelessWidget {
     );
   }
 }
-
-
-
-/*Center(
-          child: Container(
-        padding: EdgeInsets.all(7.0),
-        child: Column(
-          children: <Widget>[
-            Container(
-              color: Colors.white,
-              alignment: Alignment.center,
-              child: Image(
-                image: NetworkImage('${widget.product.image}'),
-                height: 300,
-                width: 300,
-              ),
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  new Text(
-                    widget.product.desc.toString(),
-                    style: TextStyle(fontSize: 25.0),
-                  ),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  new Text(
-                    "\$${widget.product.price!.toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 38.0),
-                  ),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  new Text(
-                    "Existencias: ${widget.product.stock} unidades",
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  Row(
-                    children: [
-                      Text('Cantidad: ', style: TextStyle(fontSize: 18.0)),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        width: 60,
-                        height: 40,
-                        padding: EdgeInsets.only(left: 3.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                              color: Colors.black,
-                              style: BorderStyle.solid,
-                              width: 0.0),
-                        ),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          underline: Container(
-                            color: Colors.transparent,
-                          ),
-                          value: dropdownValue,
-                          elevation: 16,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownValue = newValue!;
-                            });
-                          },
-                          items: List.generate(
-                              items.length,
-                              (index) => DropdownMenuItem(
-                                  value: items[index],
-                                  child: Text(
-                                    items[index],
-                                    style: TextStyle(fontSize: 18),
-                                  ))),
-
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  _Boton(
-                      text: 'Comprar',
-                      icon: Icon(Icons.monetization_on),
-                      color: Colors.cyan[800]!,
-                      textColor: Colors.black,
-                      onTap: () {}),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  _Boton(
-                      text: 'Agregar al carrito',
-                      icon: Icon(Icons.add_shopping_cart),
-                      color: Colors.white,
-                      textColor: Colors.black,
-                      onTap: () {
-                        _navigateToShoppingCart(context, widget.user);
-                      }),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-          ],
-        ),
-      )
-
-          ),*/
