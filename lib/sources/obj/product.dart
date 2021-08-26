@@ -4,7 +4,7 @@ class Product {
   String? _id;
   String? _desc;
   String? _image;
-  double? _price;
+  String? _price;
   String? _stock;
 
   Product(this._id, this._desc, this._image, this._price, this._stock);
@@ -19,14 +19,14 @@ class Product {
   String? get id => _id;
   String? get desc => _desc;
   String? get image => _image;
-  double? get price => _price;
+  String? get price => _price;
   String? get stock => _stock;
 
   Product.fromSnapShot(DataSnapshot snapshot) {
     _id = snapshot.key;
     _desc = snapshot.value['descripcion'];
     _image = snapshot.value['imagen'];
-    _price = snapshot.value['precioventa'];
+    _price = snapshot.value['precioventa'].toString();
     _stock = snapshot.value['stock'].toString();
   }
 }

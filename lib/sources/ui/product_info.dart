@@ -8,21 +8,25 @@ import 'package:proyecto_final/sources/obj/product.dart';
 import 'package:proyecto_final/sources/ui/shopping_cart.dart';
 
 class ProductInfo extends StatefulWidget {
-  final Product product;
+  final String? productId;
   final String user;
 
-  ProductInfo(this.product, this.user);
+  ProductInfo(this.productId, this.user);
 
   @override
   State createState() => ProductInfoState();
 }
 
-final productReference =
-    FirebaseDatabase.instance.reference().child("producto");
+final userReference = FirebaseDatabase.instance.reference();
 
 class ProductInfoState extends State<ProductInfo> {
   String? piecesChoosen;
-  List<Product>? items;
+
+  String? image;
+  String? desc;
+  String? price;
+  String? stock;
+
   List<String> items2 = [];
   int position = 0;
 
@@ -35,7 +39,14 @@ class ProductInfoState extends State<ProductInfo> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    items = [];
+
+    image = '';
+    desc = '';
+    price = '0';
+    stock = '0';
+
+    final productReference =
+        FirebaseDatabase.instance.reference().child("producto");
     _onProductAddedSubscription =
         productReference.onChildAdded.listen(_onProductAdded);
     _onProductChangedSubscription =
@@ -57,7 +68,12 @@ class ProductInfoState extends State<ProductInfo> {
   Widget build(BuildContext context) {
     //int position = 0;
 
-    int pieces = int.parse(widget.product.stock.toString());
+    Widget okButton = FlatButton(
+      child: Text("Aceptar"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
 
     return Scaffold(
         backgroundColor: Colors.cyan[200],
@@ -75,7 +91,7 @@ class ProductInfoState extends State<ProductInfo> {
                 color: Colors.white,
                 alignment: Alignment.center,
                 child: Image(
-                  image: NetworkImage('${items![position].image}'),
+                  image: NetworkImage(image!),
                   height: 300,
                   width: 300,
                 ),
@@ -88,21 +104,21 @@ class ProductInfoState extends State<ProductInfo> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   new Text(
-                    items![position].desc.toString(),
+                    desc!,
                     style: TextStyle(fontSize: 25.0),
                   ),
                   SizedBox(
                     height: 15.0,
                   ),
                   new Text(
-                    "\$${items![position].price!.toStringAsFixed(2)}",
+                    "\$" + price!,
                     style: TextStyle(fontSize: 38.0),
                   ),
                   SizedBox(
                     height: 15.0,
                   ),
                   new Text(
-                    "Existencias: ${items![position].stock} unidades",
+                    "Existencias: ${stock!} unidades",
                     style: TextStyle(fontSize: 18.0),
                   ),
                   SizedBox(
@@ -138,7 +154,7 @@ class ProductInfoState extends State<ProductInfo> {
                             });
                           },
                           items: List.generate(
-                              int.parse(items![position].stock.toString()),
+                              items2.length,
                               (index) => DropdownMenuItem(
                                   value: (index + 1).toString(),
                                   child: Text(
@@ -154,9 +170,9 @@ class ProductInfoState extends State<ProductInfo> {
                   ),
                   _Boton(
                       text: 'Comprar',
-                      icon: Icon(Icons.monetization_on),
+                      icon: Icon(Icons.monetization_on_outlined),
                       color: Colors.cyan[800]!,
-                      textColor: Colors.black,
+                      textColor: Colors.white,
                       onTap: () {}),
                   SizedBox(
                     height: 15.0,
@@ -167,6 +183,7 @@ class ProductInfoState extends State<ProductInfo> {
                       color: Colors.white,
                       textColor: Colors.black,
                       onTap: () {
+                        checaExistencia(widget.user, widget.productId);
                         _navigateToShoppingCart(context, widget.user);
                       }),
                 ],
@@ -188,35 +205,95 @@ class ProductInfoState extends State<ProductInfo> {
 
   void _onProductAdded(Event event) {
     setState(() {
-      items?.add(new Product.fromSnapShot(event.snapshot));
-      actualizaPiezas();
+      Product prod = Product.fromSnapShot(event.snapshot);
+
+      if (prod.id == widget.productId) {
+        image = prod.image.toString();
+        desc = prod.desc.toString();
+        price = double.parse(prod.price!).toStringAsFixed(2);
+        stock = int.parse(prod.stock!).toString();
+
+        print(stock);
+      }
+
+      dropdownValue = '1';
+
+      actualizaPiezas(stock);
     });
   }
 
   void _onProductUpdate(Event event) {
-    var oldProductValuew =
-        items?.singleWhere((product) => product.id == event.snapshot.key);
     setState(() {
-      items![items!.indexOf(oldProductValuew!)] =
-          new Product.fromSnapShot(event.snapshot);
+      Product prod = Product.fromSnapShot(event.snapshot);
 
-      actualizaPiezas();
+      if (prod.id == widget.productId) {
+        image = prod.image.toString();
+        desc = prod.desc.toString();
+        price = double.parse(prod.price!).toStringAsFixed(2);
+        stock = int.parse(prod.stock!).toString();
+
+        if (prod.stock == '0') {
+          Navigator.of(context).pop();
+
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Lo sentimos"),
+                  content: Text("Este producto está fuera de stock"),
+                  actions: [
+                    FlatButton(
+                      child: Text("Aceptar"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              });
+        } else {
+          actualizaPiezas(stock);
+        }
+      }
     });
   }
 
-  void actualizaPiezas() {
-    for (int i = 0; i < items!.length; i++) {
-      if (items![i].id == widget.product.id) {
-        position = i;
-      }
+  void actualizaPiezas(String? stockString) {
+    int stock = int.parse(stockString!);
+    if (int.parse(dropdownValue) > stock) {
+      dropdownValue = stockString;
     }
 
-    for (var i = 0; i < int.parse(items![position].stock.toString()); i++) {
+    items2 = [];
+    for (int i = 0; i < stock; i++) {
       items2.add((i + 1).toString());
     }
   }
 
   void llenaOpciones() {}
+
+  Future<void> checaExistencia(String id_user, String? id_product) async {
+    print(id_user);
+    await userReference
+        .child('cliente/' + id_user + '/carrito/' + id_product!)
+        .once()
+        .then((DataSnapshot snapshot) {
+      if (!snapshot.exists) {
+        print('no hay carrito');
+        userReference
+            .child('cliente/' + id_user + '/carrito/' + id_product)
+            .set({"cantidad": dropdownValue});
+      } else {
+        Map<dynamic, dynamic> map = snapshot.value;
+        print(map.values.toList()[0]);
+        int add = int.parse(map.values.toList()[0].toString());
+        int newQuantity = add + int.parse(dropdownValue);
+        userReference
+            .child('cliente/' + id_user + '/carrito/' + id_product)
+            .update({"cantidad": newQuantity});
+      }
+    });
+  }
 }
 
 class _Boton extends StatelessWidget {
@@ -248,7 +325,10 @@ class _Boton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon.icon),
+              Icon(
+                icon.icon,
+                color: textColor,
+              ),
               SizedBox(
                 width: 5,
               ),

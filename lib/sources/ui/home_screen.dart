@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_final/sources/bloc/auth_cubit.dart';
 import 'package:proyecto_final/sources/obj/list_product.dart';
+import 'package:proyecto_final/sources/ui/search_screen.dart';
 import 'package:proyecto_final/sources/ui/shopping_cart.dart';
 
 class HomeScreen extends StatelessWidget {
   final databaseReference = FirebaseDatabase.instance;
   static Widget create(BuildContext context) => HomeScreen();
   String id_user = '';
+  final controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +76,16 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextField(
+                        controller: controller,
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) {
+                          controller.clear();
+                          searchProduct(context, value, id_user);
+                        },
                         decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
+                            prefixIcon: Icon(Icons.search),
                             border: OutlineInputBorder(),
                             hintText: 'Buscar'),
                       ),
@@ -99,5 +108,16 @@ class HomeScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (context) => ShoppingCart(user)),
     );
+  }
+
+  void searchProduct(
+      BuildContext context, String searchString, String user) async {
+    if (!searchString.trim().isEmpty) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SearchScreen(searchString, user)),
+      );
+    }
   }
 }

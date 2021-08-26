@@ -56,17 +56,6 @@ class _SignIn extends StatelessWidget {
               ),
             ),
             if (isSigningIn) CircularProgressIndicator(),
-
-            /*   _BotonInicioSesion(
-              text: 'Iniciar sesión de prueba',
-              imagePath: 'assets/question.png',
-              color: Colors.lightBlue[100]!,
-              textColor: Colors.black,
-              onTap: () {
-                //todo
-              }),
-*/
-
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 20,
@@ -90,14 +79,6 @@ class _SignIn extends StatelessWidget {
                         context.read<AuthCubit>().reset();
                         Navigator.pushNamed(context, Routes.signInEmail);
                       }),
-                  /*SizedBox(height: 8),
-                  _BotonInicioSesion(
-                    text: 'Iniciar sesión de prueba',
-                    imagePath: 'assets/question.png',
-                    color: Colors.purple[200]!,
-                    textColor: Colors.black,
-                    onTap: () => context.read<AuthCubit>().signInAnonymously(),
-                  ),*/
                   SizedBox(height: 50),
                   OutlineButton(
                       child: Text('Crear cuenta nueva'),
@@ -111,7 +92,6 @@ class _SignIn extends StatelessWidget {
           ],
         ),
       ),
-      //padding: EdgeInsets.all(24.0),
     );
   }
 }

@@ -14,9 +14,6 @@ class ListProduct extends StatefulWidget {
   State<StatefulWidget> createState() => ListProductState();
 }
 
-final productReference =
-    FirebaseDatabase.instance.reference().child('producto');
-
 class ListProductState extends State<ListProduct> {
   List<Product>? items;
 
@@ -28,6 +25,10 @@ class ListProductState extends State<ListProduct> {
     // TODO: implement initState
     super.initState();
     items = [];
+
+    final productReference =
+        FirebaseDatabase.instance.reference().child('producto');
+
     _onProductAddedSubscription =
         productReference.onChildAdded.listen(_onProductAdded);
     _onProductChangedSubscription =
@@ -59,8 +60,9 @@ class ListProductState extends State<ListProduct> {
                   ListTile(
                     contentPadding: EdgeInsets.all(5.0),
                     title: Text('${items![position].desc}'),
-                    subtitle:
-                        Text("\$" + items![position].price!.toStringAsFixed(2)),
+                    subtitle: Text("\$" +
+                        double.parse(items![position].price!)
+                            .toStringAsFixed(2)),
                     leading: Image(
                       image: NetworkImage('${items![position].image}'),
                       height: 70,
@@ -68,76 +70,13 @@ class ListProductState extends State<ListProduct> {
                     ),
                     onTap: () => {
                       _navigateToProductInformation(
-                          context, items![position], widget.user)
+                          context, items![position].id, widget.user)
                     },
                   ),
-
-                  /*new Text(
-                    '${items![position].desc}',
-                    style: TextStyle(
-                      fontSize: 21.0,
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 8.0)),
-                  new Text(
-                    '\$${items![position].price}',
-                    style: TextStyle(
-                      fontSize: 21.0,
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 8.0)),
-                  new Text(
-                    '${items![position].stock} disponibles',
-                    style: TextStyle(
-                      fontSize: 21.0,
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 8.0)),*/
                 ],
               ),
             )
           ],
-          /* children: <Widget>[
-            Divider(
-              height: 7.0,
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                    child: ListTile(
-                  title: Text(
-                    '${items![position].desc}',
-                    style: TextStyle(
-                      fontSize: 21.0,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '${items![position].price}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                    ),
-                  ),
-                  leading: Column(
-                    children: <Widget>[
-                      CircleAvatar(
-                        backgroundColor: Colors.orange,
-                        radius: 17.0,
-                        child: Text(
-                          '${items![position].stock}',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  onTap: () => {
-                    _navigateToProductInformation(context, items![position])
-                  },
-                ))
-              ],
-            )
-          ],*/
         );
       },
     );
@@ -146,21 +85,48 @@ class ListProductState extends State<ListProduct> {
 
   void _onProductAdded(Event event) {
     setState(() {
-      items?.add(new Product.fromSnapShot(event.snapshot));
+      Product prod = Product.fromSnapShot(event.snapshot);
+      int stock = int.parse(prod.stock.toString());
+
+      if (stock > 0) {
+        items?.add(prod);
+      }
     });
   }
 
   void _onProductUpdate(Event event) {
-    var oldProductValuew =
-        items?.singleWhere((product) => product.id == event.snapshot.key);
     setState(() {
-      items![items!.indexOf(oldProductValuew!)] =
-          new Product.fromSnapShot(event.snapshot);
+      bool contains = false;
+      int located = 0;
+      int stock = 0;
+
+      Product prod = Product.fromSnapShot(event.snapshot);
+      stock = int.parse(prod.stock.toString());
+
+      for (int i = 0; i < items!.length; i++) {
+        print(items![i].id);
+        if (items![i].id == prod.id) {
+          contains = true;
+          located = i;
+        }
+      }
+
+      if (contains) {
+        if (stock > 0) {
+          items![located] = prod;
+        } else {
+          items!.removeAt(located);
+        }
+      } else {
+        if (stock > 0) {
+          items?.add(prod);
+        }
+      }
     });
   }
 
   void _navigateToProductInformation(
-      BuildContext context, Product product, String user) async {
+      BuildContext context, String? product, String user) async {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ProductInfo(product, user)),
