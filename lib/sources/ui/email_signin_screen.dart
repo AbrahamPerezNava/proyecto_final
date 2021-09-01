@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_final/sources/bloc/auth_cubit.dart';
+import 'package:proyecto_final/sources/ui/reset_password.dart';
 
 class EmailSignIn extends StatefulWidget {
   static Widget create(BuildContext context) => EmailSignIn();
@@ -45,16 +46,6 @@ class _EmailSignInState extends State<EmailSignIn> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        if (state is AuthSigningIn)
-                          Center(child: CircularProgressIndicator()),
-                        if (state is AuthError)
-                          Text(
-                            state.message,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 24,
-                            ),
-                          ),
                         SizedBox(height: 70),
                         Image.asset(
                           'assets/sign-in.png',
@@ -84,15 +75,26 @@ class _EmailSignInState extends State<EmailSignIn> {
                         TextFormField(
                           controller: _passwordController,
                           decoration: InputDecoration(
-                            icon: Icon(Icons.lock),
-                            labelText: 'Contraseña',
-                          ),
+                              icon: Icon(Icons.lock),
+                              labelText: 'Contraseña',
+                              suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                  icon: !_obscureText
+                                      ? Icon(
+                                          Icons.visibility,
+                                          color: Colors.black,
+                                        )
+                                      : Icon(
+                                          Icons.visibility_off,
+                                          color: Colors.black,
+                                        ))),
                           validator: validator,
                           obscureText: _obscureText,
                         ),
-                        new FlatButton(
-                            onPressed: _toggle,
-                            child: new Text(_obscureText ? "Abc" : "***")),
                         SizedBox(height: 30),
                         Center(
                           child: ElevatedButton(
@@ -112,6 +114,28 @@ class _EmailSignInState extends State<EmailSignIn> {
                                         Colors.cyan[800]!),
                               )),
                         ),
+                        SizedBox(height: 15),
+                        Center(
+                          child: TextButton(
+                            child: Text(
+                              '¿Olvidaste tu contraseña?',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            onPressed: () {
+                              _navigateToReset(context);
+                            },
+                          ),
+                        ),
+                        if (state is AuthSigningIn)
+                          Center(child: CircularProgressIndicator()),
+                        if (state is AuthError)
+                          Text(
+                            state.message,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 15.0,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -121,6 +145,13 @@ class _EmailSignInState extends State<EmailSignIn> {
           );
         },
       ),
+    );
+  }
+
+  void _navigateToReset(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ResetPassword()),
     );
   }
 }

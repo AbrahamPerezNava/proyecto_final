@@ -14,6 +14,7 @@ class _EmailCreateState extends State<EmailCreate> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _lastNameController2 = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -22,24 +23,15 @@ class _EmailCreateState extends State<EmailCreate> {
   bool _obscureText = true;
   bool _obscureText2 = true;
 
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
-  void _toggle2() {
-    setState(() {
-      _obscureText2 = !_obscureText2;
-    });
-  }
-
   String? emailValidator(String? value) {
-    return (value == null || value.isEmpty) ? 'Este campo es necesario' : null;
+    return (value == null || value.trim().toString().isEmpty)
+        ? 'Este campo es necesario'
+        : null;
   }
 
   String? passwordValidator(String? value) {
-    if (value == null || value.isEmpty) return 'Este campo es necesario';
+    if (value == null || value.trim().toString().isEmpty)
+      return 'Este campo es necesario';
     if (value.length < 8)
       return 'La contraseña debe contener al menos 8 caracteres';
 
@@ -66,16 +58,6 @@ class _EmailCreateState extends State<EmailCreate> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        if (state is AuthSigningIn)
-                          Center(child: CircularProgressIndicator()),
-                        if (state is AuthError)
-                          Text(
-                            state.message,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 24,
-                            ),
-                          ),
                         Image.asset(
                           'assets/add-user.png',
                           width: 115,
@@ -93,6 +75,7 @@ class _EmailCreateState extends State<EmailCreate> {
                         SizedBox(height: 30),
                         TextFormField(
                           controller: _firstNameController,
+                          validator: emailValidator,
                           decoration: InputDecoration(
                               icon: Icon(Icons.account_box),
                               labelText: 'Nombre'),
@@ -100,13 +83,15 @@ class _EmailCreateState extends State<EmailCreate> {
                         SizedBox(height: 20),
                         TextFormField(
                           controller: _lastNameController,
+                          validator: emailValidator,
                           decoration: InputDecoration(
                               icon: Icon(Icons.account_box),
                               labelText: 'Apellido Paterno'),
                         ),
                         SizedBox(height: 20),
                         TextFormField(
-                          controller: _lastNameController,
+                          controller: _lastNameController2,
+                          validator: emailValidator,
                           decoration: InputDecoration(
                               icon: Icon(Icons.account_box),
                               labelText: 'Apellido Materno'),
@@ -114,6 +99,7 @@ class _EmailCreateState extends State<EmailCreate> {
                         SizedBox(height: 20),
                         TextFormField(
                           controller: _phoneNumberController,
+                          validator: emailValidator,
                           decoration: InputDecoration(
                               icon: Icon(Icons.phone), labelText: 'Teléfono'),
                         ),
@@ -128,25 +114,50 @@ class _EmailCreateState extends State<EmailCreate> {
                         TextFormField(
                           controller: _passwordController,
                           decoration: InputDecoration(
-                              icon: Icon(Icons.lock), labelText: 'Contraseña'),
+                              icon: Icon(Icons.lock),
+                              labelText: 'Contraseña',
+                              suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                  icon: !_obscureText
+                                      ? Icon(
+                                          Icons.visibility,
+                                          color: Colors.black,
+                                        )
+                                      : Icon(
+                                          Icons.visibility_off,
+                                          color: Colors.black,
+                                        ))),
                           validator: passwordValidator,
                           obscureText: _obscureText,
                         ),
-                        new FlatButton(
-                            onPressed: _toggle,
-                            child: new Text(_obscureText ? "Abc" : "***")),
-                        SizedBox(height: 5),
+                        SizedBox(height: 20),
                         TextFormField(
                           controller: _repeatPasswordController,
                           decoration: InputDecoration(
                               icon: Icon(Icons.lock),
-                              labelText: 'Repite contraseña'),
+                              labelText: 'Repite contraseña',
+                              suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText2 = !_obscureText2;
+                                    });
+                                  },
+                                  icon: !_obscureText2
+                                      ? Icon(
+                                          Icons.visibility,
+                                          color: Colors.black,
+                                        )
+                                      : Icon(
+                                          Icons.visibility_off,
+                                          color: Colors.black,
+                                        ))),
                           validator: passwordValidator,
                           obscureText: _obscureText2,
                         ),
-                        new FlatButton(
-                            onPressed: _toggle2,
-                            child: new Text(_obscureText2 ? "Abc" : "***")),
                         SizedBox(height: 30),
                         Center(
                           child: ElevatedButton(
@@ -166,6 +177,13 @@ class _EmailCreateState extends State<EmailCreate> {
                                         Colors.cyan[800]!),
                               )),
                         ),
+                        if (state is AuthSigningIn)
+                          Center(child: CircularProgressIndicator()),
+                        if (state is AuthError)
+                          Text(
+                            state.message,
+                            style: TextStyle(color: Colors.red, fontSize: 15.0),
+                          ),
                       ],
                     ),
                   ),

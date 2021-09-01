@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:collection';
-
+import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_final/sources/obj/product.dart';
+import 'package:proyecto_final/sources/obj/product_on_cart.dart';
+import 'package:proyecto_final/sources/ui/payment_screen.dart';
 import 'package:proyecto_final/sources/ui/shopping_cart.dart';
 
 class ProductInfo extends StatefulWidget {
@@ -173,7 +174,10 @@ class ProductInfoState extends State<ProductInfo> {
                       icon: Icon(Icons.monetization_on_outlined),
                       color: Colors.cyan[800]!,
                       textColor: Colors.white,
-                      onTap: () {}),
+                      onTap: () {
+                        _navigateToPaymentScreen(context, widget.productId!,
+                            price!, int.parse(dropdownValue));
+                      }),
                   SizedBox(
                     height: 15.0,
                   ),
@@ -200,6 +204,24 @@ class ProductInfoState extends State<ProductInfo> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ShoppingCart(user)),
+    );
+  }
+
+  void _navigateToPaymentScreen(
+      BuildContext context, String idProduct, String price, int pieces) async {
+    ProductOnCart prod = ProductOnCart(idProduct, pieces.toString(), true);
+    List<ProductOnCart> list = [];
+    list.add(prod);
+    double aux = double.parse(price);
+    double total = aux * pieces;
+
+    globals.total = total.toStringAsFixed(2);
+    globals.cart = list;
+    globals.cartToPay = false;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentScreen()),
     );
   }
 
@@ -270,8 +292,6 @@ class ProductInfoState extends State<ProductInfo> {
     }
   }
 
-  void llenaOpciones() {}
-
   Future<void> checaExistencia(String id_user, String? id_product) async {
     print(id_user);
     await userReference
@@ -282,7 +302,7 @@ class ProductInfoState extends State<ProductInfo> {
         print('no hay carrito');
         userReference
             .child('cliente/' + id_user + '/carrito/' + id_product)
-            .set({"cantidad": dropdownValue});
+            .set({"cantidad": int.parse(dropdownValue)});
       } else {
         Map<dynamic, dynamic> map = snapshot.value;
         print(map.values.toList()[0]);

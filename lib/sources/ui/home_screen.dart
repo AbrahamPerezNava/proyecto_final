@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_final/sources/bloc/auth_cubit.dart';
 import 'package:proyecto_final/sources/obj/list_product.dart';
@@ -67,6 +67,9 @@ class HomeScreen extends StatelessWidget {
         buildWhen: (previous, current) => current is AuthSignedIn,
         builder: (_, state) {
           final authUser = (state as AuthSignedIn).user;
+          globals.user = authUser.uid;
+          globals.email = authUser.email;
+
           id_user = authUser.uid;
           return Center(
             child: Column(

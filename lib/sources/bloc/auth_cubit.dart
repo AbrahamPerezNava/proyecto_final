@@ -55,6 +55,11 @@ class AuthCubit extends Cubit<AuthState> {
     _authSubscription.cancel();
     return super.close();
   }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _authRepository.sendPasswordResetEmail(email);
+  }
 }
 
 abstract class AuthState extends Equatable {

@@ -1,10 +1,12 @@
 import 'dart:async';
-
+import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_final/sources/obj/product.dart';
 import 'package:proyecto_final/sources/obj/product_on_cart.dart';
+import 'package:proyecto_final/sources/ui/payment_screen.dart';
+import 'package:proyecto_final/sources/ui/screen_lists.dart';
 
 class ShoppingCart extends StatefulWidget {
   final String user;
@@ -79,7 +81,11 @@ class ShoppingCartState extends State<ShoppingCart> {
         title: Text('Carrito de compra'),
         backgroundColor: Colors.cyan[800],
         actions: <Widget>[
-          IconButton(onPressed: () {}, icon: Icon(Icons.receipt)),
+          IconButton(
+              onPressed: () {
+                navigateToListsScreen(context);
+              },
+              icon: Icon(Icons.receipt)),
         ],
       ),
       body: Center(
@@ -170,6 +176,65 @@ class ShoppingCartState extends State<ShoppingCart> {
       for (int i = 0; i < widget.allProducts!.length; i++) {
         if (widget.allProducts![i].id == prod.id) {
           widget.allProducts![i] = prod;
+
+          for (int j = 0; j < widget.productsOnCart!.length; j++) {
+            if (prod.id == widget.productsOnCart![j].id) {
+              print('Esta en el carrito');
+
+              if (int.parse(prod.stock.toString()) > 0) {
+                if (int.parse(prod.stock.toString()) <
+                    int.parse(widget.productsOnCart![j].quantity.toString())) {
+                  print('El stock es mas bajo');
+
+                  changeCartQuantity(prod.id, prod.stock.toString());
+
+                  //widget.productsOnCart![j] = newProd;
+
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Aviso"),
+                          content: Text("El stock de " +
+                              prod.desc.toString() +
+                              " cambió, y es menor a las piezas en su carrito. \n\nHemos actualizado las piezas disponibles en su carrito"),
+                          actions: [
+                            FlatButton(
+                              child: Text("Aceptar"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
+                }
+              } else {
+                deleteFromCart(prod.id);
+
+                //widget.productsOnCart![j] = newProd;
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Aviso"),
+                        content: Text("El producto " +
+                            prod.desc.toString() +
+                            " ya no está disponible. \n\nEl producto ha sido retirado de su carrito"),
+                        actions: [
+                          FlatButton(
+                            child: Text("Aceptar"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              }
+            }
+          }
           calculateTotal();
         }
       }
@@ -182,6 +247,47 @@ class ShoppingCartState extends State<ShoppingCart> {
   void onProductRemoved(Event event) {
     setState(() {
       print('Borrado');
+      print(event.snapshot.value);
+
+      Product prod = Product.fromSnapShot(event.snapshot);
+
+      for (int i = 0; i < widget.allProducts!.length; i++) {
+        if (widget.allProducts![i].id == prod.id) {
+          widget.allProducts!.removeAt(i);
+
+          for (int j = 0; j < widget.productsOnCart!.length; j++) {
+            if (prod.id == widget.productsOnCart![j].id) {
+              print('Esta en el carrito');
+
+              deleteFromCart(prod.id);
+
+              //widget.productsOnCart![j] = newProd;
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Aviso"),
+                      content: Text("El producto " +
+                          prod.desc.toString() +
+                          " ya no está disponible. \n\nEl producto ha sido retirado de su carrito"),
+                      actions: [
+                        FlatButton(
+                          child: Text("Aceptar"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            }
+          }
+          calculateTotal();
+        }
+      }
+
+      print('Modificado');
       print(event.snapshot.value);
     });
   }
@@ -248,7 +354,38 @@ class ShoppingCartState extends State<ShoppingCart> {
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 12.0),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text("Advertencia"),
+                                              content: Text(
+                                                  "¿Seguro que quieres eliminar este producto de tu carrito de compra?"),
+                                              actions: [
+                                                FlatButton(
+                                                  child: Text("No"),
+                                                  color: Colors.blue[100],
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                  child: Text("Si"),
+                                                  color: Colors.red,
+                                                  textColor: Colors.white,
+                                                  onPressed: () {
+                                                    deleteFromCart(widget
+                                                        .productsOnCart![
+                                                            position]
+                                                        .id);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          });
+                                    },
                                     style: ButtonStyle(
                                       backgroundColor:
                                           MaterialStateProperty.all<Color>(
@@ -402,7 +539,10 @@ class ShoppingCartState extends State<ShoppingCart> {
                       icon: Icon(Icons.payment),
                       color: Colors.cyan[800]!,
                       textColor: Colors.white,
-                      onTap: () {}),
+                      onTap: () {
+                        navigateToPaymentString(
+                            context, total, widget.productsOnCart!);
+                      }),
                 ],
               ),
             )
@@ -410,6 +550,25 @@ class ShoppingCartState extends State<ShoppingCart> {
           ],
         ),
       ),
+    );
+  }
+
+  void navigateToPaymentString(
+      BuildContext context, double total, List<ProductOnCart> cart) async {
+    globals.total = total.toStringAsFixed(2);
+    globals.cart = cart;
+    globals.cartToPay = true;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentScreen()),
+    );
+  }
+
+  void navigateToListsScreen(BuildContext context) async {
+    globals.cart = widget.productsOnCart!;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ScreenLists()),
     );
   }
 
@@ -433,6 +592,12 @@ class ShoppingCartState extends State<ShoppingCart> {
     userReference
         .child('cliente/' + widget.user + '/carrito/' + idProdCart!)
         .update({"cantidad": int.parse(newQuantity)});
+  }
+
+  void deleteFromCart(String? idProdCart) {
+    userReference
+        .child('cliente/' + widget.user + '/carrito/' + idProdCart!)
+        .remove();
   }
 }
 
@@ -487,271 +652,3 @@ class _Boton extends StatelessWidget {
     );
   }
 }
-
-class _BottomBar extends StatelessWidget {
-  final bool appBar;
-  final String id_user;
-
-  _BottomBar({Key? key, required this.id_user, required this.appBar})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 115.0, //set your height here
-      width: double.maxFinite, //set your width here
-
-      child: Visibility(
-        visible: appBar,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              color: Colors.white,
-              padding: EdgeInsets.all(7.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Total:',
-                    style: TextStyle(fontSize: 28.0),
-                  ),
-                  Text(
-                    '\$345.00',
-                    style: TextStyle(fontSize: 28.0),
-                  )
-                ],
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              padding: EdgeInsets.fromLTRB(7.0, 7.0, 7.0, 15.0),
-              child: Column(
-                children: [
-                  _Boton(
-                      text: 'Continuar con la compra',
-                      icon: Icon(Icons.payment),
-                      color: Colors.cyan[800]!,
-                      textColor: Colors.white,
-                      onTap: () {}),
-                ],
-              ),
-            )
-            //add as many tabs as you want here
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/*class ListCart extends StatefulWidget {
-  final String user;
-
-  List<ProductOnCart>? productsOnCart;
-  List<Product>? allProducts;
-
-  ListCart(this.user);
-  @override
-  State<StatefulWidget> createState() => ListCartState();
-}
-
-class ListCartState extends State<ListCart> {
-  bool cartExist = false;
-
-  StreamSubscription<Event>? _onProductAddedToCart;
-  StreamSubscription<Event>? _onProductChangedOnCart;
-  StreamSubscription<Event>? _onProductDeletedOnCart;
-
-  StreamSubscription<Event>? _onProductAdded;
-  StreamSubscription<Event>? _onProductChanged;
-  StreamSubscription<Event>? _onProductDeleted;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    widget.productsOnCart = [];
-    widget.allProducts = [];
-
-    cartExist = false;
-
-    final cartReference =
-        FirebaseDatabase.instance.reference().child('cliente/' + widget.user);
-
-    final productReference =
-        FirebaseDatabase.instance.reference().child('producto');
-
-    _onProductAddedToCart = cartReference.onChildAdded.listen(onCartAdded);
-    _onProductChangedOnCart = cartReference.onChildChanged.listen(onCartUpdate);
-    _onProductDeletedOnCart =
-        cartReference.onChildRemoved.listen(onCartRemoved);
-
-    _onProductAdded = productReference.onChildAdded.listen(onProductAdded);
-    _onProductChanged = productReference.onChildChanged.listen(onProductUpdate);
-    _onProductDeleted =
-        productReference.onChildRemoved.listen(onProductRemoved);
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _onProductAddedToCart?.cancel();
-    _onProductChangedOnCart?.cancel();
-    _onProductDeletedOnCart?.cancel();
-    _onProductAdded?.cancel();
-    _onProductChanged?.cancel();
-    _onProductDeleted?.cancel();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (cartExist) {
-      print(widget.productsOnCart!.length);
-      return ListView.builder(
-        itemCount: widget.productsOnCart!.length,
-        padding: EdgeInsets.all(7.0),
-        itemBuilder: (context, position) {
-          return Column(
-            children: <Widget>[
-              Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 10,
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      contentPadding: EdgeInsets.all(5.0),
-                      title: Text(widget
-                          .allProducts![widget.allProducts!.indexWhere(
-                              (element) =>
-                                  element.id ==
-                                  widget.productsOnCart![position].id)]
-                          .desc
-                          .toString()),
-                      subtitle: Text(widget
-                              .allProducts![widget.allProducts!.indexWhere(
-                                  (element) =>
-                                      element.id ==
-                                      widget.productsOnCart![position].id)]
-                              .stock
-                              .toString() +
-                          " disponibles"),
-                      leading: Icon(
-                        Icons.access_alarm,
-                      ),
-                      onTap: () => {},
-                    ),
-                  ],
-                ),
-              )
-            ],
-          );
-        },
-      );
-    } else {
-      return Container(
-        padding: EdgeInsets.all(7.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/sad.png',
-              width: 150,
-              height: 150,
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Text(
-              'Aun no tienes productos en tu carrito de compra',
-              style: TextStyle(
-                fontSize: 22.0,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void onCartAdded(Event event) {
-    setState(() {
-      print('cart added');
-
-      Map<dynamic, dynamic> map = event.snapshot.value;
-
-      cartExist = true;
-
-      for (int i = 0; i < map.length; i++) {
-        String id = map.keys.toList()[i].toString();
-        String quantity = map.values
-            .toList()[i]
-            .toString()
-            .replaceAll(new RegExp(r'[^0-9]'), '');
-
-        ProductOnCart prodCart = ProductOnCart(id, quantity, true);
-        print(prodCart.id);
-        print(prodCart.quantity);
-        widget.productsOnCart!.add(prodCart);
-      }
-    });
-  }
-
-  void onCartUpdate(Event event) {
-    setState(() {
-      print('cart updated');
-      Map<dynamic, dynamic> map = event.snapshot.value;
-
-      widget.productsOnCart = [];
-
-      for (int i = 0; i < map.length; i++) {
-        String id = map.keys.toList()[i].toString();
-        String quantity = map.values
-            .toList()[i]
-            .toString()
-            .replaceAll(new RegExp(r'[^0-9]'), '');
-
-        ProductOnCart prodCart = ProductOnCart(id, quantity, true);
-        print(prodCart.id);
-        print(prodCart.quantity);
-        widget.productsOnCart!.add(prodCart);
-      }
-    });
-  }
-
-  void onCartRemoved(Event event) {
-    setState(() {
-      widget.productsOnCart = [];
-      cartExist = false;
-    });
-  }
-
-  //////////////////////////////////////////////////////////
-
-  void onProductAdded(Event event) {
-    setState(() {
-      Product prod = Product.fromSnapShot(event.snapshot);
-      print('Agrega');
-      widget.allProducts?.add(prod);
-    });
-  }
-
-  void onProductUpdate(Event event) {
-    setState(() {
-      print('Modificado');
-      print(event.snapshot.value);
-    });
-  }
-
-  void onProductRemoved(Event event) {
-    setState(() {
-      print('Borrado');
-      print(event.snapshot.value);
-    });
-  }
-  
-}*/

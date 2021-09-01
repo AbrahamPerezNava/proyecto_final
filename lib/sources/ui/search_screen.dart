@@ -125,6 +125,7 @@ class ListSearchState extends State<ListSearch> {
 
   StreamSubscription<Event>? _onProductAddedSubscription;
   StreamSubscription<Event>? _onProductChangedSubscription;
+  StreamSubscription<Event>? _onProductDeletedSubscription;
 
   @override
   void initState() {
@@ -136,6 +137,8 @@ class ListSearchState extends State<ListSearch> {
 
     _onProductAddedSubscription =
         userReference.onChildAdded.listen(_onProductAdded);
+    _onProductDeletedSubscription =
+        userReference.onChildRemoved.listen(_onProductDeleted);
     _onProductChangedSubscription =
         userReference.onChildChanged.listen(_onProductUpdate);
   }
@@ -146,6 +149,7 @@ class ListSearchState extends State<ListSearch> {
     super.dispose();
     _onProductAddedSubscription?.cancel();
     _onProductChangedSubscription?.cancel();
+    _onProductDeletedSubscription?.cancel();
   }
 
   @override
@@ -265,6 +269,30 @@ class ListSearchState extends State<ListSearch> {
             stock > 0) {
           items?.add(prod);
           productExist = true;
+        }
+      }
+    });
+  }
+
+  void _onProductDeleted(Event event) {
+    setState(() {
+      bool contains = false;
+      int located = 0;
+
+      Product prod = Product.fromSnapShot(event.snapshot);
+
+      for (int i = 0; i < items!.length; i++) {
+        if (items![i].id == prod.id) {
+          contains = true;
+          located = i;
+        }
+      }
+
+      if (contains) {
+        items!.removeAt(located);
+
+        if (items!.isEmpty) {
+          productExist = false;
         }
       }
     });

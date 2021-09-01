@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 import 'package:proyecto_final/sources/repository/auth_repository.dart';
 
 class AuthRepository extends AuthRepositoryBase {
@@ -8,7 +9,7 @@ class AuthRepository extends AuthRepositoryBase {
   final userReference = FirebaseDatabase.instance.reference().child('cliente');
 
   AuthUser? _userFromFirebase(User? user) =>
-      user == null ? null : AuthUser(user.uid, user.uid);
+      user == null ? null : AuthUser(user.uid, user.email!);
 
   @override
   Stream<AuthUser?> get onAuthStateChanged =>
@@ -18,6 +19,11 @@ class AuthRepository extends AuthRepositoryBase {
   Future<AuthUser?> signInAnonymously() async {
     final user = await _firebaseAuth.signInAnonymously();
     return _userFromFirebase(user.user);
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
   @override
@@ -45,6 +51,7 @@ class AuthRepository extends AuthRepositoryBase {
         await FirebaseAuth.instance.signInWithCredential(credential);
     print(authResult.user!.uid);
     checaExistencia(authResult.user!.uid, authResult.user!.email);
+    globals.email = authResult.user!.email!;
     return _userFromFirebase(authResult.user);
   }
 
@@ -54,6 +61,7 @@ class AuthRepository extends AuthRepositoryBase {
     final result = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
     checaExistencia(result.user!.uid, result.user!.email);
+    globals.email = result.user!.email!;
     return _userFromFirebase(result.user);
   }
 
@@ -63,6 +71,8 @@ class AuthRepository extends AuthRepositoryBase {
     final result = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
     checaExistencia(result.user!.uid, result.user!.email);
+
+    globals.email = result.user!.email!;
 
     return _userFromFirebase(result.user);
   }

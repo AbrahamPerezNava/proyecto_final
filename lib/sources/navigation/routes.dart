@@ -5,6 +5,7 @@ import 'package:proyecto_final/sources/ui/home_screen.dart';
 import 'package:proyecto_final/sources/ui/inicio_sesion.dart';
 import 'package:proyecto_final/sources/ui/product_info.dart';
 import 'package:proyecto_final/sources/ui/splash_screen.dart';
+import 'package:proyecto_final/sources/ui/successful_payment.dart';
 
 class Routes {
   static const splash = '/';

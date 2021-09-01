@@ -19,6 +19,7 @@ class ListProductState extends State<ListProduct> {
 
   StreamSubscription<Event>? _onProductAddedSubscription;
   StreamSubscription<Event>? _onProductChangedSubscription;
+  StreamSubscription<Event>? _onProductDeletedSubscription;
 
   @override
   void initState() {
@@ -31,6 +32,8 @@ class ListProductState extends State<ListProduct> {
 
     _onProductAddedSubscription =
         productReference.onChildAdded.listen(_onProductAdded);
+    _onProductDeletedSubscription =
+        productReference.onChildRemoved.listen(_onProductDeleted);
     _onProductChangedSubscription =
         productReference.onChildChanged.listen(_onProductUpdate);
   }
@@ -41,6 +44,7 @@ class ListProductState extends State<ListProduct> {
     super.dispose();
     _onProductAddedSubscription?.cancel();
     _onProductChangedSubscription?.cancel();
+    _onProductDeletedSubscription?.cancel();
   }
 
   @override
@@ -90,6 +94,29 @@ class ListProductState extends State<ListProduct> {
 
       if (stock > 0) {
         items?.add(prod);
+      }
+    });
+  }
+
+  void _onProductDeleted(Event event) {
+    setState(() {
+      bool contains = false;
+      int located = 0;
+
+      Product prod = Product.fromSnapShot(event.snapshot);
+      //stock = int.parse(prod.stock.toString());
+
+      for (int i = 0; i < items!.length; i++) {
+        if (items![i].id == prod.id) {
+          print(prod.id);
+          contains = true;
+          located = i;
+        }
+      }
+
+      if (contains) {
+        print('borra');
+        items!.removeAt(located);
       }
     });
   }
