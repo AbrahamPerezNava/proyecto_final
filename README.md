@@ -1,16 +1,25 @@
-# proyecto_final
+# Proyecto de residencia
 
-A new Flutter application.
+Implementación de pasarelas de pago para cobros en linea, habilitados en una aplicación desarrollada en Flutter
 
-## Getting Started
+## Información
 
-This project is a starting point for a Flutter application.
+Ojalá esto les sirva como punto de partida, en caso de que estes considerando usar alguna de estas pasarelas para hacer tus cobros en tu app:
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+*MercadoPago
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*PayPal
+
+*Stripe
+
+*Payu (este no sirve porque xd)
+
+
+Ademas del uso de otros recursos como la autenticacion de Google, la conexión con Realtime Database de Firebase y quiza alguna implementación traviesa por alli.
+
+Si tienes alguna duda o necesitas aclaraciones de alguna mamada que haya dejado en el codigo, sientete libre de dejar un comentario anexando tu respectivo "uwu" al final
+
+Ojalá te sea de ayuda c:
+
+-Beny
