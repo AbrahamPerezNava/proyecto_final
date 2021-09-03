@@ -18,3 +18,6 @@ String mpAccessToken =
 
 String mpClientID = "7510030192174874";
 String mpClientSecret = "Bh2xZ3OeNd29qH3q2uviwuGNDlLh8omK";
+
+String razorpay_keyId = 'rzp_test_7RfGQWJBQj7XIf';
+String razorpay_keySecret = 'voDMrnFYOKjt0Tz0oA08fCLj';

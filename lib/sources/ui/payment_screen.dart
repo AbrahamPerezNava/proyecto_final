@@ -6,6 +6,7 @@ import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 import 'package:proyecto_final/sources/payment_controllers/paypal_payment.dart';
 import 'package:proyecto_final/sources/ui/stripe_options.dart';
 import 'package:proyecto_final/sources/ui/successful_payment.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -13,8 +14,16 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class PaymentScreenState extends State<PaymentScreen> {
+  Razorpay? razorpay;
+
   @override
   initState() {
+    razorpay = new Razorpay();
+
+    razorpay!.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlerPaymentSuccess);
+    razorpay!.on(Razorpay.EVENT_PAYMENT_ERROR, handlerPaymentError);
+    razorpay!.on(Razorpay.EVENT_EXTERNAL_WALLET, handlerExternalWallet);
+
     const channelMercadoPagoRespuesta =
         const MethodChannel("waviacademy.com/mercadoPagoRespuesta");
 
@@ -32,6 +41,69 @@ class PaymentScreenState extends State<PaymentScreen> {
     });
 
     super.initState();
+  }
+
+  @override //overriding noSuchMethod
+  noSuchMethod(Invocation invocation) =>
+      'Got the ${invocation.memberName} with arguments ${invocation.positionalArguments}';
+
+  @override
+  void dispose() {
+    super.dispose();
+    razorpay!.clear();
+  }
+
+  void openCheckout() {
+    var options = {
+      'key': globals.razorpay_keyId,
+      'amount': num.parse(globals.total) * 100,
+      "currency": "MXN",
+      'name': 'Papelería Wilfrido',
+      'description': 'Articulos de papeleria',
+      'prefill': {'contact': '8888888888', 'email': globals.email},
+      "external": {
+        "wallets": ["paytm"]
+      }
+    };
+
+    try {
+      razorpay!.open(options);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void handlerPaymentSuccess(PaymentSuccessResponse response) {
+    print('pago realizado con exito');
+    print(response.paymentId);
+    _navigateToSuccess(context);
+  }
+
+  void handlerPaymentError(PaymentFailureResponse response) {
+    print('error en el pago');
+    print(response.code.toString());
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(
+                "Hubo un error con su método de pago o el pago fue cancelado \n\nIntente denuevo más tarde"),
+            actions: [
+              FlatButton(
+                child: Text("Aceptar"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void handlerExternalWallet(ExternalWalletResponse response) {
+    print('pago con billetera externa');
+    print(response.walletName);
   }
 
   @override
@@ -90,9 +162,11 @@ class PaymentScreenState extends State<PaymentScreen> {
                       height: 15.0,
                     ),
                     CustomButton(
-                        onTap: () {},
-                        text: 'PayU',
-                        imagePath: 'assets/payu.png'),
+                        onTap: () {
+                          openCheckout();
+                        },
+                        text: 'Razorpay',
+                        imagePath: 'assets/razorpay.png'),
                     SizedBox(
                       height: 15.0,
                     ),
@@ -206,7 +280,7 @@ class PaymentScreenState extends State<PaymentScreen> {
 
           final response = channelMercadoPago.invokeMethod(
               'mercadoPago', <String, dynamic>{
-            "publicKey": globals.mpPublicKey,
+            "publicKey": globals.mpTESTPublicKey,
             "preferenceId": preferenceId
           });
 
