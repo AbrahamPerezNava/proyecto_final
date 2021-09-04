@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_final/sources/bloc/auth_cubit.dart';
+import 'package:proyecto_final/sources/obj/globals.dart' as globals;
 
 class EmailCreate extends StatefulWidget {
   static Widget create(BuildContext context) => EmailCreate();
@@ -26,6 +27,12 @@ class _EmailCreateState extends State<EmailCreate> {
   String? emailValidator(String? value) {
     return (value == null || value.trim().toString().isEmpty)
         ? 'Este campo es necesario'
+        : null;
+  }
+
+  String? phoneValidator(String? value) {
+    return (value == null || value.trim().length < 10)
+        ? 'El número de teléfono debe tener 10 dígitos'
         : null;
   }
 
@@ -99,7 +106,7 @@ class _EmailCreateState extends State<EmailCreate> {
                         SizedBox(height: 20),
                         TextFormField(
                           controller: _phoneNumberController,
-                          validator: emailValidator,
+                          validator: phoneValidator,
                           decoration: InputDecoration(
                               icon: Icon(Icons.phone), labelText: 'Teléfono'),
                         ),
@@ -164,6 +171,14 @@ class _EmailCreateState extends State<EmailCreate> {
                               child: Text('Crear cuenta'),
                               onPressed: () {
                                 if (_formKey.currentState?.validate() == true) {
+                                  globals.client = _firstNameController.text +
+                                      ' ' +
+                                      _lastNameController.text +
+                                      ' ' +
+                                      _lastNameController2.text;
+
+                                  globals.phone = _phoneNumberController.text;
+
                                   context
                                       .read<AuthCubit>()
                                       .createUserWithEmailAndPassword(

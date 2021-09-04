@@ -7,6 +7,7 @@ import 'package:proyecto_final/sources/bloc/auth_cubit.dart';
 import 'package:proyecto_final/sources/obj/list_product.dart';
 import 'package:proyecto_final/sources/ui/search_screen.dart';
 import 'package:proyecto_final/sources/ui/shopping_cart.dart';
+import 'package:proyecto_final/sources/ui/shopping_record.dart';
 
 class HomeScreen extends StatelessWidget {
   final databaseReference = FirebaseDatabase.instance;
@@ -46,31 +47,13 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Productos'),
         backgroundColor: Colors.cyan[800],
-        actions: <Widget>[
-          IconButton(
-              onPressed: () {
-                _navigateToShoppingCart(context, id_user);
-              },
-              icon: Icon(Icons.shopping_cart)),
-          IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return alert;
-                    });
-              },
-              icon: Icon(Icons.power_settings_new))
-        ],
       ),
       body: BlocBuilder<AuthCubit, AuthState>(
         buildWhen: (previous, current) => current is AuthSignedIn,
         builder: (_, state) {
-          final authUser = (state as AuthSignedIn).user;
-          globals.user = authUser.uid;
-          globals.email = authUser.email;
+          //final authUser = (state as AuthSignedIn).user;
 
-          id_user = authUser.uid;
+          id_user = globals.user;
           return Center(
             child: Column(
               children: <Widget>[
@@ -103,6 +86,65 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
+      drawer: Drawer(
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+                decoration: BoxDecoration(color: Color(0xFF00838F)),
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Hola denuevo ' + globals.client.split(' ').first,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(color: Colors.white, fontSize: 26.0),
+                      ),
+                      Icon(
+                        Icons.account_box,
+                        size: 58.0,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
+                )),
+            ListTile(
+              title: const Text('Carrito de compra'),
+              leading: Icon(Icons.shopping_cart),
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToShoppingCart(context, id_user);
+              },
+            ),
+            ListTile(
+              title: const Text('Compras'),
+              leading: Icon(Icons.shopping_basket),
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToShoppingRecord(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Cerrar sesión'),
+              leading: Icon(Icons.power_settings_new),
+              onTap: () {
+                Navigator.pop(context);
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return alert;
+                    });
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -110,6 +152,13 @@ class HomeScreen extends StatelessWidget {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ShoppingCart(user)),
+    );
+  }
+
+  void _navigateToShoppingRecord(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ShoppingRecord()),
     );
   }
 

@@ -39,7 +39,7 @@ class ResetPasswordState extends State<ResetPassword> {
                     children: [
                       SizedBox(height: 70),
                       Image.asset(
-                        'assets/sign-in.png',
+                        'assets/wrong-password.png',
                         width: 115,
                         height: 115,
                       ),

@@ -204,11 +204,27 @@ class SuccessfulPaymentState extends State<SuccessfulPayment> {
       }
     });
 
-    dbReference.child('venta/' + newId.toString()).set({
-      "cliente": globals.user,
-      "fecha": DateTime.now().toString(),
-      "total": globals.total
-    });
+    if (globals.shippment) {
+      dbReference.child('venta/' + newId.toString()).set({
+        "cliente": globals.user,
+        "receptor": globals.receiverName,
+        "fecha": DateTime.now().toString(),
+        "total": globals.total,
+        "pasarela": globals.method,
+        "envio": 'si',
+        "direccion": globals.address
+      });
+    } else {
+      dbReference.child('venta/' + newId.toString()).set({
+        "cliente": globals.user,
+        "receptor": globals.receiverName,
+        "fecha": DateTime.now().toString(),
+        "total": globals.total,
+        "pasarela": globals.method,
+        "envio": 'no',
+        "direccion": ''
+      });
+    }
 
     for (int i = 0; i < globals.cart.length; i++) {
       dbReference

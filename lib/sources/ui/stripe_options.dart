@@ -21,6 +21,7 @@ class StripeOptionsState extends State<StripeOptions> {
     await dialog.hide();
 
     if (response.success!) {
+      globals.method = 'Stripe';
       _navigateToSuccess(context);
     } else {
       if (response.message != 'cancelled') {

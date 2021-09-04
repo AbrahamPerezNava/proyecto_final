@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_final/sources/obj/product.dart';
 import 'package:proyecto_final/sources/obj/product_on_cart.dart';
 import 'package:proyecto_final/sources/ui/payment_screen.dart';
+import 'package:proyecto_final/sources/ui/shippment_details.dart';
 import 'package:proyecto_final/sources/ui/shopping_cart.dart';
 
 class ProductInfo extends StatefulWidget {
@@ -175,7 +176,7 @@ class ProductInfoState extends State<ProductInfo> {
                       color: Colors.cyan[800]!,
                       textColor: Colors.white,
                       onTap: () {
-                        _navigateToPaymentScreen(context, widget.productId!,
+                        _navigateToShippmentScreen(context, widget.productId!,
                             price!, int.parse(dropdownValue));
                       }),
                   SizedBox(
@@ -207,7 +208,7 @@ class ProductInfoState extends State<ProductInfo> {
     );
   }
 
-  void _navigateToPaymentScreen(
+  void _navigateToShippmentScreen(
       BuildContext context, String idProduct, String price, int pieces) async {
     ProductOnCart prod = ProductOnCart(idProduct, pieces.toString(), true);
     List<ProductOnCart> list = [];
@@ -221,7 +222,7 @@ class ProductInfoState extends State<ProductInfo> {
 
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentScreen()),
+      MaterialPageRoute(builder: (context) => ShippmentDetails()),
     );
   }
 

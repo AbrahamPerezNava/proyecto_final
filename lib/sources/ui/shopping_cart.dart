@@ -7,6 +7,7 @@ import 'package:proyecto_final/sources/obj/product.dart';
 import 'package:proyecto_final/sources/obj/product_on_cart.dart';
 import 'package:proyecto_final/sources/ui/payment_screen.dart';
 import 'package:proyecto_final/sources/ui/screen_lists.dart';
+import 'package:proyecto_final/sources/ui/shippment_details.dart';
 
 class ShoppingCart extends StatefulWidget {
   final String user;
@@ -482,7 +483,7 @@ class ShoppingCartState extends State<ShoppingCart> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/sad.png',
+              'assets/carro-vacio.png',
               width: 150,
               height: 150,
             ),
@@ -540,7 +541,7 @@ class ShoppingCartState extends State<ShoppingCart> {
                       color: Colors.cyan[800]!,
                       textColor: Colors.white,
                       onTap: () {
-                        navigateToPaymentString(
+                        navigateToShippmentString(
                             context, total, widget.productsOnCart!);
                       }),
                 ],
@@ -553,14 +554,14 @@ class ShoppingCartState extends State<ShoppingCart> {
     );
   }
 
-  void navigateToPaymentString(
+  void navigateToShippmentString(
       BuildContext context, double total, List<ProductOnCart> cart) async {
     globals.total = total.toStringAsFixed(2);
     globals.cart = cart;
     globals.cartToPay = true;
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentScreen()),
+      MaterialPageRoute(builder: (context) => ShippmentDetails()),
     );
   }
 

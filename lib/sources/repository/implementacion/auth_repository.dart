@@ -30,6 +30,12 @@ class AuthRepository extends AuthRepositoryBase {
   Future<void> singOut() async {
     await GoogleSignIn().signOut();
     await _firebaseAuth.signOut();
+
+    globals.client = '';
+    globals.phone = '';
+
+    globals.user = '';
+    globals.email = '';
   }
 
   @override
@@ -50,8 +56,14 @@ class AuthRepository extends AuthRepositoryBase {
     final authResult =
         await FirebaseAuth.instance.signInWithCredential(credential);
     print(authResult.user!.uid);
+
     checaExistencia(authResult.user!.uid, authResult.user!.email);
+
     globals.email = authResult.user!.email!;
+    globals.user = authResult.user!.uid;
+    globals.client = authResult.user!.displayName!;
+    globals.phone = authResult.user!.phoneNumber!;
+
     return _userFromFirebase(authResult.user);
   }
 
@@ -60,8 +72,10 @@ class AuthRepository extends AuthRepositoryBase {
       String email, String password) async {
     final result = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
-    checaExistencia(result.user!.uid, result.user!.email);
     globals.email = result.user!.email!;
+    globals.user = result.user!.uid;
+    checaExistencia(result.user!.uid, result.user!.email);
+
     return _userFromFirebase(result.user);
   }
 
@@ -70,9 +84,9 @@ class AuthRepository extends AuthRepositoryBase {
       String email, String password) async {
     final result = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
-    checaExistencia(result.user!.uid, result.user!.email);
-
     globals.email = result.user!.email!;
+    globals.user = result.user!.uid;
+    checaExistencia(result.user!.uid, result.user!.email);
 
     return _userFromFirebase(result.user);
   }
@@ -87,13 +101,17 @@ class AuthRepository extends AuthRepositoryBase {
       if (!snapshot.exists) {
         creaUsuario(id_user, mail);
       } else {
+        globals.user = id_user;
+        globals.email = mail!;
         Map<dynamic, dynamic> map = snapshot.value;
-        print(map.values.toList()[0]["email"]);
+        globals.client = map.values.toList()[0]["nombre"].toString();
+        globals.phone = map.values.toList()[0]["telefono"].toString();
       }
     });
   }
 
-  void creaUsuario(String id_user, String? name) {
-    userReference.child(id_user).set({"email": name});
+  void creaUsuario(String id_user, String? mail) {
+    userReference.child(id_user).set(
+        {"email": mail, "nombre": globals.client, "telefono": globals.phone});
   }
 }

@@ -74,7 +74,7 @@ class _SignIn extends StatelessWidget {
                       text: 'Iniciar sesión con email',
                       imagePath: 'assets/email.png',
                       color: Colors.cyan[800]!,
-                      textColor: Colors.black,
+                      textColor: Colors.white,
                       onTap: () {
                         context.read<AuthCubit>().reset();
                         Navigator.pushNamed(context, Routes.signInEmail);

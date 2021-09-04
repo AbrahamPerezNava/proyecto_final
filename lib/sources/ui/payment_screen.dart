@@ -76,6 +76,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   void handlerPaymentSuccess(PaymentSuccessResponse response) {
     print('pago realizado con exito');
     print(response.paymentId);
+    globals.method = 'Razorpay';
     _navigateToSuccess(context);
   }
 
@@ -218,6 +219,7 @@ class PaymentScreenState extends State<PaymentScreen> {
           onFinish: (number) async {
             // payment done
             print('order id: ' + number);
+            globals.method = 'PayPal';
             _navigateToSuccess(context);
           },
         ),
@@ -236,6 +238,7 @@ class PaymentScreenState extends State<PaymentScreen> {
     print("idPago $idPago");
     print("status $status");
     print("statusDetails $statusDetails");
+    globals.method = 'MercadoPago';
     _navigateToSuccess(context);
   }
 

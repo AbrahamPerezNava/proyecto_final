@@ -199,7 +199,7 @@ class ListSearchState extends State<ListSearch> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/sad.png',
+              'assets/search.png',
               width: 150,
               height: 150,
             ),

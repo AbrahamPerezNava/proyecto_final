@@ -1,6 +1,7 @@
 library my_prj.globals;
 
 import 'package:proyecto_final/sources/obj/product_on_cart.dart';
+import 'package:proyecto_final/sources/obj/sale.dart';
 
 String user = '';
 String total = '';
@@ -21,3 +22,13 @@ String mpClientSecret = "Bh2xZ3OeNd29qH3q2uviwuGNDlLh8omK";
 
 String razorpay_keyId = 'rzp_test_7RfGQWJBQj7XIf';
 String razorpay_keySecret = 'voDMrnFYOKjt0Tz0oA08fCLj';
+
+String client = '';
+String phone = '';
+
+String address = '';
+String method = '';
+String receiverName = '';
+bool shippment = false;
+
+Sale? selectedSale;
