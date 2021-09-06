@@ -18,6 +18,8 @@ Ojalá esto les sirva como punto de partida, en caso de que estes considerando u
 *Razorpay (a ver, era obvio que tenía que sustituir Payu con algo, no me juzguen, al menos sirve T.T)
 
 
+
+
 Ademas del uso de otros recursos como la autenticacion de Google, la conexión con Realtime Database de Firebase y quiza alguna implementación traviesa por alli.
 
 Si tienes alguna duda o necesitas aclaraciones de alguna mamada que haya dejado en el codigo, sientete libre de dejar un comentario anexando tu respectivo "uwu" al final
