@@ -13,19 +13,15 @@ Ojalá esto les sirva como punto de partida, en caso de que estes considerando u
 
 *Stripe
 
-*Payu (este no sirve porque xd)
+*Payu (Deshabilitado por incompatibilidad)
 
-*Razorpay (a ver, era obvio que tenía que sustituir Payu con algo, no me juzguen, al menos sirve T.T)
-
-
+*Razorpay (Sustituye a Payu)
 
 
-Ademas del uso de otros recursos como la autenticacion de Google, la conexión con Realtime Database de Firebase y quiza alguna implementación traviesa por alli.
 
-Si tienes alguna duda o necesitas aclaraciones de alguna mamada que haya dejado en el codigo, sientete libre de dejar un comentario anexando tu respectivo "uwu" al final
 
-Ojalá te sea de ayuda c:
+Ademas del uso de otros recursos como la autenticacion de Google, la conexión con Realtime Database de Firebase etc
 
-*NOTA IMPORTANTE: Aguas si usan el emulador de Android Studio porque esa cosa causa un bug en el inicio de sesion a veces. Si usas tu celular todo funciona al 100 asi que no entren en panico, si sirve e.e
 
+*NOTA IMPORTANTE: Si usan el emulador de Android Studio puede causar un bug en el inicio de sesion a veces. Si usas tu celular todo funciona correctamente
 -Beny
